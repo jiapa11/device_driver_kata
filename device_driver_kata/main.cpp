@@ -1,6 +1,7 @@
 #include "gmock/gmock.h"
 #include "device_driver.h"
 #include "mock_flash_memory_device.cpp"
+#include "application.cpp"
 
 using namespace testing;
 
@@ -79,6 +80,35 @@ TEST_F(DeviceDriverFixture, Write_Fail_TargetAddressNotDeleted) {
 		.WillOnce(Return(0x12));
 
 	EXPECT_THROW(driver.write(TARGET_WRITE_ADDRESS, WRITE_VALUE), WriteException);
+}
+
+class ApplicationFixture : public DeviceDriverFixture {
+public:
+	Application application{&driver};
+};
+
+TEST_F(ApplicationFixture, application_read_success) {
+	EXPECT_CALL(hardware, read)
+		.Times(9 * 5)
+		.WillRepeatedly(Return(0x28));
+		
+	application.readAndPrint(0, 8);
+}
+
+TEST_F(ApplicationFixture, application_write_success) {
+	EXPECT_CALL(hardware, read)
+		.WillRepeatedly(Return(DeviceDriver::DELETED));
+	application.writeAll(0xAB);
+}
+
+TEST_F(ApplicationFixture, application_write_fail_inbetween) {
+	EXPECT_CALL(hardware, read)
+		.WillOnce(Return(DeviceDriver::DELETED))
+		.WillOnce(Return(DeviceDriver::DELETED))
+		.WillOnce(Return(0x65))
+		.WillRepeatedly(Return(DeviceDriver::DELETED));
+
+	EXPECT_THROW(application.writeAll(0xAB), WriteException);
 }
 
 int main() {

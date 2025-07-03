@@ -27,6 +27,9 @@
     <ClCompile Include="mock_flash_memory_device.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
+    <ClCompile Include="application.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="device_driver.h">
