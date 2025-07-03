@@ -16,6 +16,7 @@ public:
 
 	const int TARGET_READ_ADDRESS = 0xFF;
 	const int TARGET_WRITE_ADDRESS = TARGET_READ_ADDRESS;
+	const int WRITE_VALUE = 0xDE;
 };
 
 TEST_F(DeviceDriverFixture, Read_Success_ReturnCorrectValue) {
@@ -66,7 +67,7 @@ TEST_F(DeviceDriverFixture, Write_Success) {
 		.WillOnce(Return(DeviceDriver::DELETED));
 
 	try {
-		driver.write(TARGET_WRITE_ADDRESS, 0xDEAD);
+		driver.write(TARGET_WRITE_ADDRESS, WRITE_VALUE);
 	}
 	catch (const std::exception& e) {
 		FAIL();
@@ -77,7 +78,7 @@ TEST_F(DeviceDriverFixture, Write_Fail_TargetAddressNotDeleted) {
 	EXPECT_CALL(hardware, read)
 		.WillOnce(Return(0x12));
 
-	EXPECT_THROW(driver.write(TARGET_WRITE_ADDRESS, 0xDEAD), WriteException);
+	EXPECT_THROW(driver.write(TARGET_WRITE_ADDRESS, WRITE_VALUE), WriteException);
 }
 
 int main() {
