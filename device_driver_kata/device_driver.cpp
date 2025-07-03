@@ -29,15 +29,18 @@ bool DeviceDriver::verifyRead(int readValue, long address)
 
 void DeviceDriver::write(long address, int data)
 {
-    int readValue = read_(address);
-    if (FlashMemoryDevice::DELETED == readValue)
+    if (isTargetAddressDeleted(address))
     {
         write_(address, data);
     }
     else {
-        //throw std::exception("writing to not-deleted area");
         throw WriteException();
     }
+}
+
+bool DeviceDriver::isTargetAddressDeleted(long address)
+{
+    return FlashMemoryDevice::DELETED == read_(address);
 }
 
 void DeviceDriver::write_(long address, int data)

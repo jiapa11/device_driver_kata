@@ -27,6 +27,8 @@ public:
     int read(long address);
     bool verifyRead(int readValue, long address);
     void write(long address, int data);
+
+    bool isTargetAddressDeleted(long address);
     
     static const int DELETED = FlashMemoryDevice::DELETED;
 protected:
