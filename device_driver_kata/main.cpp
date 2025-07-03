@@ -15,6 +15,7 @@ public:
 	DeviceDriver driver{&hardware};
 
 	const int TARGET_READ_ADDRESS = 0xFF;
+	const int TARGET_WRITE_ADDRESS = TARGET_READ_ADDRESS;
 };
 
 TEST_F(DeviceDriverFixture, Read_Success_ReturnCorrectValue) {
@@ -26,10 +27,11 @@ TEST_F(DeviceDriverFixture, Read_Success_ReturnCorrectValue) {
 		.WillOnce(Return(0xAA));
 	
 	int data = driver.read(TARGET_READ_ADDRESS);
+
 	EXPECT_EQ(0xAA, data);
 }
 
-TEST_F(DeviceDriverFixture, Read_Called5times) {
+TEST_F(DeviceDriverFixture, Read_General_Called5times) {
 	EXPECT_CALL(hardware, read)
 		.Times(5);
 
@@ -47,7 +49,7 @@ TEST_F(DeviceDriverFixture, Read_Fail_RaiseException) {
 	EXPECT_THROW(driver.read(TARGET_READ_ADDRESS), ReadException);
 }
 
-TEST_F(DeviceDriverFixture, Write_General_ReadCalledAtLeastOnce) {
+TEST_F(DeviceDriverFixture, Write_General_InternalReadCalledAtLeastOnce) {
 	EXPECT_CALL(hardware, read)
 		.Times(1);
 	
@@ -64,7 +66,7 @@ TEST_F(DeviceDriverFixture, Write_Success) {
 		.WillOnce(Return(DeviceDriver::DELETED));
 
 	try {
-		driver.write(TARGET_READ_ADDRESS, 0xDEAD);
+		driver.write(TARGET_WRITE_ADDRESS, 0xDEAD);
 	}
 	catch (const std::exception& e) {
 		FAIL();
@@ -75,7 +77,7 @@ TEST_F(DeviceDriverFixture, Write_Fail_TargetAddressNotDeleted) {
 	EXPECT_CALL(hardware, read)
 		.WillOnce(Return(0x12));
 
-	EXPECT_THROW(driver.write(TARGET_READ_ADDRESS, 0xDEAD), WriteException);
+	EXPECT_THROW(driver.write(TARGET_WRITE_ADDRESS, 0xDEAD), WriteException);
 }
 
 int main() {
